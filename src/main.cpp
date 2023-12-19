@@ -76,10 +76,14 @@ void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silen
         player->SendMsg(HUD_PRINTTALK, "There aren't enough players.");
     } else {
         for (int i = 0; i < result.size(); i++) {
-            std::string playerName = db->fetchValue<std::string>(result, i, "name");
-            int playerPoints = db->fetchValue<int>(result, i, "points");
-            player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName.c_str(), playerPoints);
-        }
+    try {
+        std::string playerName = db->fetchValue<std::string>(result, i, "name");
+        int playerPoints = db->fetchValue<int>(result, i, "points");
+        player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName.c_str(), playerPoints);
+    } catch (const std::exception& e) {
+        logger->Write(LOGLEVEL_DEBUG, "Error in Command_Top: %s", e.what());
+    }
+}
     }
 }
 
