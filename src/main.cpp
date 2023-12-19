@@ -112,13 +112,13 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
         }
     }
     else if(attacker) {
-        DB_Result result = db->Query("SELECT points FROM %s WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
+    DB_Result result = db->Query("SELECT points FROM %s WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
         int currentPoints = 0;
         if(result.size() > 0) {
             currentPoints = db->fetchValue<int>(result, 0, "points");
         }
-    attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPoints + 5);
-    db->Query("UPDATE %s SET points = points + 5 WHERE steamid = '%llu' LIMIT 1", "players_credits", attacker->GetSteamID());
+    db->Query("UPDATE %s SET points = points + 5 WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID());
+    attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPoints);
     }
 }
 
