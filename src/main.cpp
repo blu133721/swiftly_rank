@@ -86,7 +86,7 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
     if(player == attacker) {
         if(currentPointsPlayer > 0) {
              attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-5 for suicide]\n", currentPointsPlayer - config->Fetch<int>("swiftly_ranks.Death"));
-            db->Query("UPDATE %s SET points = points - %s WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID(), config->Fetch<int>("swiftly_ranks.Death"));
+            db->Query("UPDATE %s SET points = points - %d WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID(), config->Fetch<int>("swiftly_ranks.Death"));
         }
     }
     else if(headshot && attacker) {
@@ -107,7 +107,7 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
     }
     else if(attacker) {
         attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPointsAttacker + config->Fetch<int>("swiftly_ranks.NormalKill"));
-        db->Query("UPDATE %s SET points = points + %s WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID(), config->Fetch<int>("swiftly_ranks.NormalKill"));
+        db->Query("UPDATE %s SET points = points + %d WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID(), config->Fetch<int>("swiftly_ranks.NormalKill"));
     }
 }
 
