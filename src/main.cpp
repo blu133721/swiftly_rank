@@ -63,12 +63,12 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
 
 void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silent)
 {
-     if (playerID == -1)
+    if (playerID == -1)
         return;
     if (!db->IsConnected())
         return;
-        Player *player = g_playerManager->GetPlayer(playerID);
-        if (player == nullptr)
+    Player *player = g_playerManager->GetPlayer(playerID);
+    if (player == nullptr)
         return;
     DB_Result result = db->Query("SELECT * FROM `ranks` ORDER BY `points` DESC LIMIT 10");
 
@@ -76,9 +76,9 @@ void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silen
         player->SendMsg(HUD_PRINTTALK, "There aren't enough players.");
     } else {
         for (int i = 0; i < result.size(); i++) {
-            int playerName = db->fetchValue<string>(result, i, "name");
+            std::string playerName = db->fetchValue<std::string>(result, i, "name");
             int playerPoints = db->fetchValue<int>(result, i, "points");
-            player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName, playerPoints);
+            player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName.c_str(), playerPoints);
         }
     }
 }
