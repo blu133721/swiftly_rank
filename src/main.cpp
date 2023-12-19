@@ -58,7 +58,7 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
     if (DeathsCommand != 0) {
         ratio = static_cast<float>(KillsCommand) / DeathsCommand;
     }
-    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default} points, %d kills, %d deaths, and %d assists with a %d K/D Ratio", player->GetName(), PointsCommand, KillsCommand, DeathsCommand, AssistsCommand, ratio);
+    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default} points, %d kills, %d deaths, and %d assists with a %2.f K/D Ratio", player->GetName(), PointsCommand, KillsCommand, DeathsCommand, AssistsCommand, ratio);
 }
 
 void OnPluginStart()
