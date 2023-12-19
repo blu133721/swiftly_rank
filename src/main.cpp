@@ -54,9 +54,24 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
     player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default} credits", player->GetName(), PointsCommand);
 }
 
+void Command_Debug(int playerID, const char **args, uint32_t argsCount, bool silent)
+{
+     if (playerID == -1)
+        return;
+    if (!db->IsConnected())
+        return;
+        Player *player = g_playerManager->GetPlayer(playerID);
+        if (player == nullptr)
+        return;
+
+        int normalKillPoints = config->Fetch<int>("swiftly_ranks.NormalKill");
+        print("normalKillPoints: %d\n", normalKillPoints);
+}
+
 void OnPluginStart()
 {
         commands->Register("rank", reinterpret_cast<void *>(&Command_Ranks));
+        commands->Register("debug", reinterpret_cast<void *>(&Command_Debug));
 
         db = new Database("CONNECTION_NAME");
 
