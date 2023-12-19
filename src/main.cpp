@@ -46,8 +46,11 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
         if (player == nullptr)
         return;
 
-    DB_Result result = db->Query("select * from `ranks` where steamid = '%llu' limit 1", player->GetSteamID());
-    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default}", (db->fetchValue<int>(result, 0, "points")), player->GetName());
+    result = db->Query("SELECT points FROM %s WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
+            if(result.size() > 0) {
+                PointsCommand = db->fetchValue<int>(result, 0, "points");
+            }
+    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default}", player->GetName(), PointsCommand);
 }
 
 void OnPluginStart()
