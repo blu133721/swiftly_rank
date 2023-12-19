@@ -33,8 +33,7 @@ void OnPlayerSpawn(Player *player)
         return;
 
     if (player->IsFirstSpawn() && !player->IsFakeClient())
-        db->Query("insert ignore into `ranks` (steamid) values ('%llu')", player->GetSteamID());
-        db->Query("insert ignore into `ranks` (name) values ('%s')", player->GetName());
+        db->Query("insert ignore into `ranks` (steamid, name) values ('%llu', '%s')", player->GetSteamID(), player->GetName());
 }
 
 void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool silent)
