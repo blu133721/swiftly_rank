@@ -81,7 +81,7 @@ void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silen
         int playerPoints = db->fetchValue<int>(result, i, "points");
         player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName.c_str(), playerPoints);
     } catch (const std::exception& e) {
-        logger->Write(LOGLEVEL_DEBUG, "Error in Command_Top: %s", e.what());
+        print("Error in Command_Top: %s", e.what());
     }
 }
     }
