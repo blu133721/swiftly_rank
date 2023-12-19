@@ -47,12 +47,12 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
         return;
 
     DB_Result result = db->Query("select * from `ranks` where steamid = '%llu' limit 1", player->GetSteamID());
-    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Ai {LIGHTBLUE}%d {DEFAULT}puncte\n", (db->fetchValue<int>(result, 0, "points")));
+    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default}", (db->fetchValue<int>(result, 0, "points")), player->GetName());
 }
 
 void OnPluginStart()
 {
-        commands->Register("ranks", reinterpret_cast<void *>(&Command_Ranks));
+        commands->Register("rank", reinterpret_cast<void *>(&Command_Ranks));
 
         db = new Database("CONNECTION_NAME");
 
@@ -72,28 +72,28 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
 
     if(player == attacker) {
         if(currentPoints > 0) {
-            player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: - %d \n", currentPoints - 1);
-            db->Query("UPDATE %s SET points = points - 2 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
+             attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-5 for suicide]\n", currentPoints - 5);
+            db->Query("UPDATE %s SET points = points - 5 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
         }
     }
     else if(headshot && attacker) {
-        player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: + %d \n", currentPoints + 10);
+         attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+10 for headshot]\n", currentPoints + 10);
         db->Query("UPDATE %s SET points = points + 10 WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID());
         if(currentPoints > 0) {
-            player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: - %d \n", currentPoints - 1);
-            db->Query("UPDATE %s SET points = points - 1 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
+            player->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-2 for dying]\n", currentPoints - 2);
+            db->Query("UPDATE %s SET points = points - 2 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
         }
     }
     else if(noscope && attacker) {
-        player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: + %d (noscope)\n", currentPoints - 1);
+        attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+10 for noscope]\n", currentPoints + 10);
         db->Query("UPDATE %s SET points = points + 10 WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID());
         if(currentPoints > 0) {
-            player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: - %d \n", currentPoints - 1);
+            player->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-2 for dying]\n", currentPoints - 2);
             db->Query("UPDATE %s SET points = points - 2 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
         }
     }
     else if(attacker) {
-    player->SendMsg(HUD_PRINTTALK, "[1TAP] Your exp: + %d \n", currentPoints - 1);
+    attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPoints + 5);
     db->Query("UPDATE %s SET points = points + 5 WHERE steamid = '%llu' LIMIT 1", "players_credits", attacker->GetSteamID());
     }
 }
