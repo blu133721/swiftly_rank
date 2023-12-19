@@ -51,7 +51,7 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
         if(result.size() > 0) {
             PointsCommand = db->fetchValue<int>(result, 0, "points");
         }
-    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default}", player->GetName(), PointsCommand);
+    player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default} credits", player->GetName(), PointsCommand);
 }
 
 void OnPluginStart()
@@ -85,8 +85,8 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
 
     if(player == attacker) {
         if(currentPointsPlayer > 0) {
-             attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-5 for suicide]\n", currentPointsPlayer - 5);
-            db->Query("UPDATE %s SET points = points - 5 WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID());
+             attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[-5 for suicide]\n", currentPointsPlayer - config->Fetch<int>("swiftly_ranks.Death"));
+            db->Query("UPDATE %s SET points = points - %s WHERE steamid = '%llu' LIMIT 1", "ranks", player->GetSteamID(), config->Fetch<int>("swiftly_ranks.Death"));
         }
     }
     else if(headshot && attacker) {
@@ -106,8 +106,8 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
         }
     }
     else if(attacker) {
-        attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPointsAttacker + 5);
-        db->Query("UPDATE %s SET points = points + 5 WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID());
+        attacker->SendMsg(HUD_PRINTTALK, "{RED} [1TAP] {DEFAULT}Your exp: %d {RED}[+5 for kill]\n", currentPointsAttacker + config->Fetch<int>("swiftly_ranks.NormalKill"));
+        db->Query("UPDATE %s SET points = points + %s WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID(), config->Fetch<int>("swiftly_ranks.NormalKill"));
     }
 }
 
