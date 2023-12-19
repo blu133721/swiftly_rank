@@ -76,7 +76,7 @@ void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silen
         player->SendMsg(HUD_PRINTTALK, "There aren't enough players.");
     } else {
         for (int i = 0; i < result.size(); i++) {
-            int playerName = db->fetchValue<int>(result, i, "name");
+            int playerName = db->fetchValue<string>(result, i, "name");
             int playerPoints = db->fetchValue<int>(result, i, "points");
             player->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName, playerPoints);
         }
