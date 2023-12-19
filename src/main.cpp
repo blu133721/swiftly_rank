@@ -87,7 +87,7 @@ void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silen
 void OnPluginStart()
 {
         commands->Register("rank", reinterpret_cast<void *>(&Command_Ranks));
-        commands->Register("top", reinterpret_cast<void *>(&Command_Ranks));
+        commands->Register("top", reinterpret_cast<void *>(&Command_Top));
 
         db = new Database("CONNECTION_DB");
 
