@@ -34,6 +34,7 @@ void OnPlayerSpawn(Player *player)
 
     if (player->IsFirstSpawn() && !player->IsFakeClient())
         db->Query("insert ignore into `ranks` (steamid) values ('%llu')", player->GetSteamID());
+        db->Query("insert ignore into `ranks` (name) values ('%s')", player->GetName());
 }
 
 void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool silent)
@@ -61,13 +62,36 @@ void Command_Ranks(int playerID, const char **args, uint32_t argsCount, bool sil
     player->SendMsg(HUD_PRINTTALK, "{RED}[1TAP] {DEFAULT}Player {RED}%s {default} has {red} %d {default} points, %d kills, %d deaths, and %d assists with a %.2f K/D Ratio", player->GetName(), PointsCommand, KillsCommand, DeathsCommand, AssistsCommand, ratio);
 }
 
+void Command_Top(int playerID, const char **args, uint32_t argsCount, bool silent)
+{
+     if (playerID == -1)
+        return;
+    if (!db->IsConnected())
+        return;
+        Player *player = g_playerManager->GetPlayer(playerID);
+        if (player == nullptr)
+        return;
+    DB_Result result = db->Query("SELECT * FROM `ranks` ORDER BY `points` DESC LIMIT 10");
+
+    if (result.size() < 10) {
+        attacker->SendMsg(HUD_PRINTTALK, "There aren't enough players.");
+    } else {
+        for (int i = 0; i < result.size(); i++) {
+            int playerName = db->fetchValue<int>(result, i, "points");
+            int playerPoints = db->fetchValue<int>(result, i, "points");
+            attacker->SendMsg(HUD_PRINTTALK, "{RED} %s %s: %d points", FetchTranslation("swiftly_ranks.prefix"), playerName, playerPoints);
+        }
+    }
+}
+
 void OnPluginStart()
 {
         commands->Register("rank", reinterpret_cast<void *>(&Command_Ranks));
+        commands->Register("top", reinterpret_cast<void *>(&Command_Ranks));
 
         db = new Database("CONNECTION_DB");
 
-        DB_Result result = db->Query("CREATE TABLE IF NOT EXISTS `ranks` (`steamid` varchar(128) NOT NULL, `points` int(11) NOT NULL DEFAULT 0, `kills` int(11) NOT NULL DEFAULT 0, `deaths` int(11) NOT NULL DEFAULT 0, `assists` int(11) NOT NULL DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;");
+        DB_Result result = db->Query("CREATE TABLE IF NOT EXISTS `ranks` (`steamid` varchar(128) NOT NULL, `points` int(11) NOT NULL DEFAULT 0, `kills` int(11) NOT NULL DEFAULT 0, `name` int(11) NOT NULL DEFAULT 0, `deaths` int(11) NOT NULL DEFAULT 0, `assists` int(11) NOT NULL DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;");
         
         if (result.size() > 0)
             db->Query("ALTER TABLE `ranks` ADD UNIQUE KEY `steamid` (`steamid`);");
@@ -100,7 +124,7 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
         }
     }
     else if(headshot && attacker) {
-         attacker->SendMsg(HUD_PRINTTALK, "{RED} %s {DEFAULT}Your exp: %d {RED}[+ %d for headshot]\n", FetchTranslation("swiftly_ranks.prefix"), currentPointsAttacker + config->Fetch<int>("swiftly_ranks.HeadShotKill"), config->Fetch<int>("swiftly_ranks.HeadShotKill"));
+        attacker->SendMsg(HUD_PRINTTALK, "{RED} %s {DEFAULT}Your exp: %d {RED}[+ %d for headshot]\n", FetchTranslation("swiftly_ranks.prefix"), currentPointsAttacker + config->Fetch<int>("swiftly_ranks.HeadShotKill"), config->Fetch<int>("swiftly_ranks.HeadShotKill"));
         db->Query("UPDATE %s SET points = points + %d WHERE steamid = '%llu' LIMIT 1", "ranks", config->Fetch<int>("swiftly_ranks.HeadShotKill"), attacker->GetSteamID());
         db->Query("UPDATE %s SET kills = kills + 1 WHERE steamid = '%llu' LIMIT 1", "ranks", attacker->GetSteamID());
         if(currentPointsPlayer > 0) {
