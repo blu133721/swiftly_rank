@@ -113,6 +113,14 @@ void OnPlayerDeath(Player *player, Player *attacker, Player *assister, bool assi
             db->Query("UPDATE %s SET points = points - %d WHERE steamid = '%llu' LIMIT 1", "ranks", config->Fetch<int>("swiftly_ranks.Death"), attacker->GetSteamID());
         }
     }
+    else if(assister) {
+        assister->SendMsg(HUD_PRINTTALK, "{RED} %s {DEFAULT}Your exp: %d {RED}[+ %d for kill]\n", FetchTranslation("swiftly_ranks.prefix"), currentPointsAttacker + config->Fetch<int>("swiftly_ranks.AssistKill"), config->Fetch<int>("swiftly_ranks.AssistKill"));
+        db->Query("UPDATE %s SET points = points + %d WHERE steamid = '%llu' LIMIT 1", "ranks", config->Fetch<int>("swiftly_ranks.NormalKill"), attacker->GetSteamID());
+        if(currentPointsPlayer > 0) {
+            player->SendMsg(HUD_PRINTTALK, "{RED} %s {DEFAULT}Your exp: %d {RED}[- %d for dying]\n", FetchTranslation("swiftly_ranks.prefix"), currentPointsPlayer - config->Fetch<int>("swiftly_ranks.Death"), config->Fetch<int>("swiftly_ranks.Death"));
+            db->Query("UPDATE %s SET points = points - %d WHERE steamid = '%llu' LIMIT 1", "ranks", config->Fetch<int>("swiftly_ranks.Death"), attacker->GetSteamID());
+        }
+    }
 }
 
 void OnPluginStop()
